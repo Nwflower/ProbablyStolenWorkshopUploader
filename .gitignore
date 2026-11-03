@@ -1,0 +1,26 @@
+# Build output and local dependencies
+bin/
+obj/
+out/
+dist/
+scratch/
+tools/dotnet8/
+tools/WorkshopUploader/lib/*.dll
+
+# User state, logs, credentials and editors
+workshop-meta.json*
+*.log
+*.tmp
+*.bak
+*.user
+*.suo
+.env
+.env.*
+*.pfx
+*.p12
+*.key
+.vs/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini

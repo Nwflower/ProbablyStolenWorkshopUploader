@@ -1,0 +1,351 @@
+<Window
+    x:Class="ProbablyStolenWorkshopUploader.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="创意工坊上传器 · Probably Stolen">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TitleBar x:Name="AppTitleBar" Title="创意工坊上传器" Subtitle="Probably Stolen">
+            <TitleBar.IconSource>
+                <BitmapIconSource UriSource="ms-appx:///Assets/probably-stolen.png" ShowAsMonochrome="False" />
+            </TitleBar.IconSource>
+        </TitleBar>
+
+    <Grid x:Name="Root" Grid.Row="1" Padding="24,12,24,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition x:Name="LogRow" Height="0" />
+        </Grid.RowDefinitions>
+
+        <!-- 游戏目录与连接状态 -->
+        <Grid Grid.Row="0" ColumnSpacing="12" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="GameDirText" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Text="Probably Stolen · 正在定位游戏目录…" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+                <Border CornerRadius="16" Padding="10,6" Background="{ThemeResource ControlFillColorSecondaryBrush}">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Ellipse x:Name="StatusDot" Width="8" Height="8" Fill="Orange" VerticalAlignment="Center" />
+                        <TextBlock x:Name="SteamStatusText" Text="正在连接 Steam…" FontSize="12" VerticalAlignment="Center"
+                                   MaxWidth="140" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </Border>
+                <Button x:Name="RetryBtn" Content="重试" Click="RetryBtn_Click"
+                        ToolTipService.ToolTip="重新连接 Steam" />
+                <Button x:Name="AboutBtn" Content="关于" Click="AboutBtn_Click"
+                        ToolTipService.ToolTip="关于上传器" />
+            </StackPanel>
+        </Grid>
+
+        <!-- 宽窗口并排；窄窗口切换为上下布局 -->
+        <Grid x:Name="WorkspaceGrid" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" />
+                <ColumnDefinition Width="14" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border x:Name="SidebarCard" Grid.Column="0" Grid.RowSpan="2" Style="{StaticResource Card}" Padding="16">
+                <Grid x:Name="SidebarLayout" RowSpacing="10" ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.ColumnSpan="2">
+                        <TextBlock Text="模组" FontSize="16" FontWeight="SemiBold" />
+                        <TextBlock x:Name="ModCountText" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
+                    </Grid>
+                    <TextBox x:Name="SearchBox" Grid.Row="1" Grid.ColumnSpan="2" PlaceholderText="搜索模组名称或 ID"
+                             TextChanged="SearchBox_TextChanged" />
+                    <Grid x:Name="SidebarActions" Grid.Row="2" Grid.ColumnSpan="2" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="BrowseBtn" Content="选择文件夹…" HorizontalAlignment="Stretch"
+                                Click="BrowseBtn_Click" />
+                        <Button x:Name="RescanBtn" Grid.Column="1" Content="刷新" Click="RescanBtn_Click"
+                                ToolTipService.ToolTip="重新扫描模组" />
+                    </Grid>
+                    <Grid Grid.Row="3" Grid.ColumnSpan="2">
+                        <ListView x:Name="ModList" ItemTemplate="{StaticResource ModTemplate}"
+                                  SelectionMode="Single" SelectionChanged="ModList_SelectionChanged" />
+                        <TextBlock x:Name="EmptyListHint" Text="没有找到模组&#x0a;可以选择文件夹手动加入"
+                                   TextAlignment="Center" TextWrapping="Wrap" IsHitTestVisible="False"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Grid x:Name="MainPane" Grid.Column="2" Grid.RowSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <ScrollViewer x:Name="DetailScroll" Grid.Row="0" VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Spacing="12" Padding="0,0,2,0">
+                        <!-- 当前模组 -->
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel Spacing="14">
+                                <Grid ColumnSpacing="8">
+                                    <TextBlock Text="当前模组" FontSize="14" FontWeight="SemiBold" />
+                                    <Border HorizontalAlignment="Right" CornerRadius="12" Padding="9,4"
+                                            Background="{ThemeResource ControlFillColorSecondaryBrush}">
+                                        <TextBlock x:Name="TargetBadgeText" Text="等待选择" FontSize="11.5"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    </Border>
+                                </Grid>
+                                <Grid x:Name="HeroGrid">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Spacing="6">
+                                        <TextBlock x:Name="InfoName" Text="选择一个模组" FontSize="20"
+                                                   FontWeight="SemiBold" TextWrapping="Wrap" />
+                                        <TextBlock x:Name="InfoMeta" FontSize="12" TextWrapping="Wrap"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                   Text="从左侧选择，或手动加入模组文件夹" />
+                                        <HyperlinkButton x:Name="ManifestIssuesBtn" Content="查看清单问题"
+                                                         Padding="0" FontSize="12" Visibility="Collapsed"
+                                                         Click="ManifestIssuesBtn_Click" />
+                                        <TextBlock x:Name="InfoPath" FontSize="12" TextTrimming="CharacterEllipsis"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                    <StackPanel x:Name="PreviewPanel" Grid.Column="1" Width="200" Margin="16,0,0,0">
+                                        <Button x:Name="PickPreviewBtn" Width="200" Height="100" Padding="0"
+                                                BorderThickness="0" CornerRadius="8" Background="Transparent"
+                                                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                                                AutomationProperties.Name="更换预览图" ToolTipService.ToolTip="更换预览图"
+                                                PointerEntered="PreviewPointerEntered" PointerExited="PreviewPointerExited"
+                                                PointerCanceled="PreviewPointerExited" GotFocus="PreviewFocusChanged"
+                                                LostFocus="PreviewFocusChanged" Click="PickPreviewBtn_Click">
+                                            <Grid>
+                                                <Border CornerRadius="8" BorderThickness="1"
+                                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                                        Background="{ThemeResource ControlFillColorSecondaryBrush}">
+                                                    <Image x:Name="PreviewImage" Stretch="UniformToFill" />
+                                                </Border>
+                                                <TextBlock x:Name="PreviewHint" Text="点击选择预览图 · 建议 2:1" FontSize="11.5"
+                                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                <Border x:Name="PreviewHoverOverlay" CornerRadius="8" Background="#99000000"
+                                                        Visibility="Collapsed" IsHitTestVisible="False">
+                                                    <Grid Width="28" Height="28" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <FontIcon x:Name="PreviewIconFallback" Glyph="&#xE70F;" FontSize="24" Foreground="White" />
+                                                        <Image x:Name="PreviewChangeIcon" Width="28" Height="28" />
+                                                    </Grid>
+                                                </Border>
+                                            </Grid>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 发布目标 -->
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="发布设置" FontSize="16" FontWeight="SemiBold" />
+
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="发布目标" FontSize="12" FontWeight="SemiBold" />
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <ComboBox x:Name="PublishedBox" HorizontalAlignment="Stretch"
+                                                  DisplayMemberPath="Display" SelectionChanged="PublishedBox_SelectionChanged" />
+                                        <Button x:Name="RefreshPublishedBtn" Grid.Column="1" Content="刷新列表"
+                                                Click="RefreshPublishedBtn_Click" />
+                                    </Grid>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                                    <Button x:Name="UsePublishedIdBtn" Content="输入物品 ID…"
+                                            Click="UsePublishedIdBtn_Click" />
+                                    <Button x:Name="ImportVdfBtn" Content="导入 VDF…"
+                                            Click="ImportVdfBtn_Click" />
+                                </StackPanel>
+
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="可见性" FontSize="12" FontWeight="SemiBold" />
+                                    <ComboBox x:Name="VisibilityBox" HorizontalAlignment="Stretch"
+                                              SelectionChanged="VisibilityBox_SelectionChanged">
+                                        <ComboBoxItem Content="保持工坊现有可见性" />
+                                        <ComboBoxItem Content="公开" />
+                                        <ComboBoxItem Content="仅好友" />
+                                        <ComboBoxItem Content="未列出" />
+                                        <ComboBoxItem Content="隐藏" />
+                                    </ComboBox>
+                                    <TextBlock x:Name="VisibilityHint" FontSize="12" TextWrapping="Wrap"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+
+                                <Border CornerRadius="8" Padding="12,8"
+                                        Background="{ThemeResource ControlFillColorSecondaryBrush}">
+                                    <CheckBox x:Name="KeepDescriptionCheck" IsChecked="True"
+                                              Checked="KeepDescriptionCheck_Changed" Unchecked="KeepDescriptionCheck_Changed">
+                                        <TextBlock Text="更新时保留工坊现有描述" TextWrapping="Wrap" />
+                                    </CheckBox>
+                                </Border>
+
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="更新说明" FontSize="12" FontWeight="SemiBold" />
+                                    <TextBox x:Name="ChangeNoteBox" PlaceholderText="写入本次更新说明"
+                                             AcceptsReturn="True" TextWrapping="Wrap" Height="96"
+                                             ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 工坊 TAG -->
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="工坊 TAG" FontSize="16" FontWeight="SemiBold" />
+                                <TextBlock FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           Text="TAG 是物品级分类（如 Mod、Gameplay、Translation），会出现在工坊侧栏的筛选项里，与各语言标题和描述无关。" />
+                                <TextBox x:Name="TagsBox" PlaceholderText="用逗号分隔，例如：Mod, Gameplay, Translation"
+                                         TextChanged="TagsBox_TextChanged" />
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="常用标签（点击添加）" FontSize="12"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    <ScrollViewer HorizontalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled"
+                                                  VerticalScrollBarVisibility="Disabled" VerticalScrollMode="Disabled">
+                                        <!-- WinUI 滚动条浮在内容上方，底部留空避免遮挡标签按钮。 -->
+                                        <StackPanel x:Name="TagSuggestionPanel" Orientation="Horizontal" Spacing="6"
+                                                    Margin="0,0,0,18" />
+                                    </ScrollViewer>
+                                </StackPanel>
+                                <Border CornerRadius="8" Padding="12,8"
+                                        Background="{ThemeResource ControlFillColorSecondaryBrush}">
+                                    <CheckBox x:Name="KeepTagsCheck" IsChecked="True"
+                                              Checked="KeepTagsCheck_Changed" Unchecked="KeepTagsCheck_Changed">
+                                        <TextBlock Text="更新时保留工坊现有 TAG" TextWrapping="Wrap" />
+                                    </CheckBox>
+                                </Border>
+                                <TextBlock x:Name="TagsHint" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 页面文案 -->
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel Spacing="12">
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="工坊页面文案" FontSize="16" FontWeight="SemiBold" />
+                                    <Button x:Name="FillEnglishBtn" Grid.Column="1" Content="用清单填充英文"
+                                            VerticalAlignment="Top" Click="FillEnglishBtn_Click" />
+                                </Grid>
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="语言" FontSize="12" FontWeight="SemiBold" />
+                                    <ComboBox x:Name="LangBox" MinWidth="200" HorizontalAlignment="Left"
+                                              SelectionChanged="LangBox_SelectionChanged" />
+                                </StackPanel>
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="标题" FontSize="12" FontWeight="SemiBold" />
+                                    <TextBox x:Name="LangTitle" PlaceholderText="输入工坊页面标题" />
+                                </StackPanel>
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="描述" FontSize="12" FontWeight="SemiBold" />
+                                    <TextBox x:Name="LangDesc" AcceptsReturn="True" TextWrapping="Wrap" Height="160"
+                                             PlaceholderText="介绍模组功能、依赖和使用方式"
+                                             ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- 固定操作区 -->
+                <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,12,0,0" Padding="16,12">
+                    <Grid RowSpacing="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Spacing="4">
+                                <TextBlock x:Name="StatusText" Text="就绪" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                <TextBlock x:Name="ReadinessText" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <ProgressBar x:Name="UploadProgress" Height="4" Minimum="0" Maximum="100" />
+                            </StackPanel>
+                            <Button x:Name="LogToggleBtn" Grid.Column="1" Content="查看日志" VerticalAlignment="Center"
+                                    Click="LogToggleBtn_Click" />
+                        </Grid>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                            <Button x:Name="MetaOnlyBtn" Content="仅更新页面" Height="38" MinWidth="120"
+                                    Click="MetaOnlyBtn_Click"
+                                    ToolTipService.ToolTip="不重传模组文件；取消勾选保留描述后才会更新简介" />
+                            <Button x:Name="UploadBtn" Content="开始上传" Height="38" MinWidth="120"
+                                    Style="{StaticResource AccentButtonStyle}" Click="UploadBtn_Click" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- 可收起的日志 -->
+        <Border x:Name="LogPanel" Grid.Row="2" Style="{StaticResource Card}" Margin="0,12,0,0" Padding="12"
+                Visibility="Collapsed">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <TextBlock Text="操作日志" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="ClearLogBtn" Content="清空" Click="ClearLogBtn_Click" />
+                        <Button Content="收起" Click="LogToggleBtn_Click" />
+                    </StackPanel>
+                </Grid>
+                <TextBox x:Name="LogBox" Grid.Row="1" Margin="0,8,0,0" IsReadOnly="True" AcceptsReturn="True"
+                         TextWrapping="NoWrap" FontFamily="Consolas" FontSize="12"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+            </Grid>
+        </Border>
+    </Grid>
+    </Grid>
+</Window>
