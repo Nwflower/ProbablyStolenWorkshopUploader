@@ -1,0 +1,12 @@
+[package]
+name = "steam-backend"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+uploader-core = { path = "../uploader-core" }
+steamworks = "0.13"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

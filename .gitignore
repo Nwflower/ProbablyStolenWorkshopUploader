@@ -1,26 +1,39 @@
-# Build output and local dependencies
-bin/
-obj/
-out/
-dist/
-scratch/
-tools/dotnet8/
-tools/WorkshopUploader/lib/*.dll
-
-# User state, logs, credentials and editors
-workshop-meta.json*
+# Logs
+logs
 *.log
-*.tmp
-*.bak
-*.user
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
 *.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local Rust toolchain and build outputs
+.toolchains/
+/target/
+test-results/
+playwright-report/
+*.pdb
+*.exe
+*.dll
 .env
 .env.*
-*.pfx
-*.p12
-*.key
-.vs/
-.idea/
-.DS_Store
-Thumbs.db
-Desktop.ini
+workshop-meta.json*
+
+# Portable packaging output
+/release/

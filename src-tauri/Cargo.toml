@@ -1,0 +1,21 @@
+[package]
+name = "workshop-uploader"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Probably Stolen Workshop Uploader"
+
+[lib]
+name = "workshop_uploader_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+uploader-core = { path = "../crates/uploader-core" }
+steam-backend = { path = "../crates/steam-backend" }
+serde = { version = "1", features = ["derive"] }
+base64 = "0.22"

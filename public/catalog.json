@@ -1,0 +1,12 @@
+{
+  "mode": "mock",
+  "version": "0.1.0",
+  "mods": [
+    {"id":"demo_details","name":"物品详情","subtitle":"物品信息与估价辅助","version":"1.4.0","color":"blue","initial":"D","path":"演示目录 / Mods / ItemDetails","title":"Item Details","description":"Show additional item information and useful details.","tags":["Mod","UI","Quality of Life"],"publishedId":"9007199254740993","valid":true},
+    {"id":"demo_inventory","name":"智能库存整理","subtitle":"更有条理的库存管理","version":"1.2.0","color":"amber","initial":"I","path":"演示目录 / Mods / SmartInventory","title":"Smart Inventory","description":"Arrange your inventory with one click.","tags":["Mod","Gameplay"],"publishedId":"9007199254740995","valid":true},
+    {"id":"demo_translation","name":"中文翻译补充","subtitle":"社区本地化内容包","version":"0.3.0","color":"green","initial":"文","path":"演示目录 / Mods / Translation","title":"Chinese Translation","description":"Additional Chinese translations.","tags":["Mod","Translation","Chinese"],"publishedId":null,"valid":true},
+    {"id":"demo_invalid","name":"待修复示例","subtitle":"演示清单校验失败的情况","version":"0.1.0","color":"rose","initial":"!","path":"演示目录 / Mods / BrokenExample","title":"Broken Example","description":"","tags":[],"publishedId":null,"valid":false}
+  ],
+  "suggestedTags":["Mod","Gameplay","UI","Quality of Life","Translation","Tools","Utilities","Chinese","Music","Mono"],
+  "languages":[{"key":"english","label":"English"},{"key":"schinese","label":"简体中文"},{"key":"russian","label":"Русский"},{"key":"spanish","label":"Español"},{"key":"french","label":"Français"},{"key":"german","label":"Deutsch"},{"key":"polish","label":"Polski"},{"key":"japanese","label":"日本語"}]
+}

@@ -1,31 +1,31 @@
-# 第三方依赖与素材
+# 第三方声明
 
-本项目原创代码 Copyright (c) 2026 千川白浪(Nwflower)，使用 `AGPL-3.0-only`。
-以下依赖、商标和游戏素材不因本项目的 LICENSE 而转为 AGPL。
+本项目原创代码使用 AGPL-3.0-only（见 [LICENSE](LICENSE)）。下列组件各自遵循其许可，
+本项目不改变、也不额外限制这些许可。
 
-## Steamworks.NET
+## 运行时与构建依赖
 
-本工程使用 Steamworks.NET 20.2.0 的独立程序集，Copyright (c) 2013-2022 Riley Labrecque，MIT License。
-许可全文见 [licenses/Steamworks.NET-MIT.txt](licenses/Steamworks.NET-MIT.txt)。
-来源：[Steamworks.NET 20.2.0](https://github.com/rlabrecque/Steamworks.NET/tree/20.2.0)，
-[原始许可证](https://github.com/rlabrecque/Steamworks.NET/blob/20.2.0/LICENSE.txt)。
-源码导出不附带该 DLL，本地构建由开发者准备。
+| 组件 | 许可 | 用途 |
+| --- | --- | --- |
+| [Tauri](https://tauri.app/)（`tauri`, `tauri-build`） | MIT / Apache-2.0 | 桌面窗口与 IPC |
+| [React](https://react.dev/) | MIT | 界面 |
+| [Vite](https://vite.dev/) | MIT | 前端构建 |
+| [lucide](https://lucide.dev/) | ISC | 图标 |
+| [serde](https://serde.rs/)、`serde_json` | MIT / Apache-2.0 | 序列化 |
+| Windows WebView2 运行时 | Microsoft 软件许可 | 由系统提供，不随本项目分发 |
+| `steam_api64.dll` | Valve Steamworks SDK 可再分发组件 | 与目标游戏一起分发，仅用于同一 AppID 的 Steam 接口 |
 
-## Steam 原生接口
+Rust 与 npm 依赖的完整版本见 `Cargo.lock` 与 `package-lock.json`。
+发布二进制时须一并提供本文件与 AGPL 正文。
 
-`steam_api64.dll` 属于 Valve 的 Steamworks SDK，不是 Steamworks.NET 的 MIT 代码，也不受本项目 AGPL 授权。
-源码导出不包含它。使用或分发时依据其原有条款；本项目不授予 Valve 组件的额外权利。
-来源：[Steamworks SDK 文档](https://partner.steamgames.com/doc/sdk)。
+## 游戏相关内容
 
-## Microsoft 组件
+- 《深空当铺 / Probably Stolen》的名称、图标与游戏素材归其权利人所有，不在本项目授权范围内。
+- 当前仓库使用 Tauri 模板生成的占位图标，尚未引入游戏素材。
+- 若后续加入游戏图标或素材，需单独确认分发授权，并在本文件注明归属。
+- 与 Steam 交互时须遵守 Steam 创意工坊条款；上传目标只能是运行者自己登录并拥有的账号。
 
-Windows App SDK、Windows SDK BuildTools、.NET 与其传递依赖按各自许可使用。
-NuGet 包中的原始许可证及 notices 是对应组件的授权依据。
-来源：[Windows App SDK](https://github.com/microsoft/WindowsAppSDK)、[.NET](https://github.com/dotnet/runtime)。
+## 数据
 
-## 游戏名称与图标
-
-`Assets/probably-stolen.png`、`Assets/probably-stolen.ico` 为《深空当铺 / Probably Stolen》相关图标，
-版权及游戏名称、标识等权利归游戏原权利人所有。本项目是非官方社区工具，不代表游戏开发商或 Valve。
-这些图标不纳入 AGPL 授权；目前未确认其开源仓库分发授权，权利归属说明不等于获得授权。
-需要调整或移除时，可通过项目 Issue 联系维护者。
+`tests/fixtures/` 与 `public/catalog.json` 是人工编写的演示数据，不包含真实玩家、
+账号、存档或工坊物品信息。
